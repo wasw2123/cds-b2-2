@@ -1,9 +1,3 @@
-# OMX local runtime state
-.omx/
-
-# Personal mission checklist and writing templates
-/local-mission/
-
 # macOS and Windows metadata
 .DS_Store
 ._*
