@@ -1,22 +1,23 @@
+import unittest
+
 from src.addition import add
 
-# test 실행 python3 -m test.test_add
 
-try:
-    def test_add_int():
-        assert add(1, 2) == 3
-        assert add(100, 1) == 101
-        print("test_add_int 성공")
-    test_add_int()
+class TestAdd(unittest.TestCase):
+    def test_positive_numbers(self):
+        self.assertEqual(add(1, 2), 3)
+        self.assertEqual(add(100, 1), 101)
 
-    def test_add_nagative():
-        assert add(1, -3) == -2
-        assert add(-5, 100) == 95
-        assert add(-1, -2) == -3
-        print("test_add_nagative 성공")
-    test_add_nagative()
-    
+    def test_negative_numbers(self):
+        self.assertEqual(add(1, -3), -2)
+        self.assertEqual(add(-5, 100), 95)
+        self.assertEqual(add(-1, -2), -3)
+
+    def test_addition_with_zero(self):
+        self.assertEqual(add(0, 5), 5)
+        self.assertEqual(add(5, 0), 5)
+        self.assertEqual(add(0, 0), 0)
 
 
-except AssertionError:
-    print("테스트 실패")
+if __name__ == "__main__":
+    unittest.main()
