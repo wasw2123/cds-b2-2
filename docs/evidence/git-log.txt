@@ -1,0 +1,132 @@
+생성 시각: 2026-10-15T15:17:31+09:00
+브랜치: feat/add-readme
+HEAD: 99f5e9629b469880863ebbbe55472324f88d6943
+main: 832742f80677347d27576a05be7671dc3236a3dc
+명령: git log --oneline --graph --all
+주의: 제출 문서 수정 커밋 및 이후 최종 PR 병합 전의 스냅샷입니다.
+
+*   99f5e96 docs: 제출물 정리를 위해 최신 main 병합
+|\  
+| *   832742f Merge pull request #33 from wasw2123/feat/troubleshooting-reset
+| |\  
+| | * 4991466 docs: conflict-resolution에 reset 섹션 동시 작성 충돌 기록 추가
+| | *   bb42e24 Merge remote-tracking branch 'origin/main' into feat/troubleshooting-reset
+| | |\  
+| | |/  
+| |/|   
+| * |   f2f04f6 Merge pull request #34 from wasw2123/docs/reset-troubleshooting
+| |\ \  
+| | * | a182233 docs: Git reset 트러블슈팅 사례 추가
+| * | |   18c02c6 Merge pull request #30 from wasw2123/feat/docs-stash-troubleshooting
+| |\ \ \  
+| | |/ /  
+| |/| |   
+| | * |   a40172a docs: 커밋 예시 보완을 stash 실습 기록 브랜치에 통합
+| | |\ \  
+| | | * \   246b797 Merge branch 'main' into feat/docs-examples
+| | | |\ \  
+| | | * | | 4c4928d docs: chore 및 test 커밋 메시지 예시 추가
+| | * | | |   ea78e8e Merge branch 'main' into feat/docs-stash-troubleshooting
+| | |\ \ \ \  
+| | * | | | | 90ba16e docs: git stash, git stash pop에 대한 트러블 슈팅 작성
+| | | |/ / /  
+| | |/| | |   
+| | * | | |   4413264 Merge branch 'main' into feat/add
+| | |\ \ \ \  
+| | | | | | * 2599f4c docs: troubleshooting-log에 reset --soft 시나리오 기록
+| | | | | | * 702553d test: 정합성 테스트에 음수 피제수 케이스 추가
+| | |_|_|_|/  
+| |/| | | |   
+| * | | | |   a2d48ae Merge pull request #27 from wasw2123/feat/division-consistency
+| |\ \ \ \ \  
+| | * | | | | 5e4a479 test: 몫·나머지 연산 정합성 테스트 추가
+| | | |_|/ /  
+| | |/| | |   
+| * | | | |   d33cbd8 Merge pull request #28 from wasw2123/feat/troubleshooting-amend
+| |\ \ \ \ \  
+| | * | | | | e899f13 docs: PR 템플릿에 Closes 이슈 연동 가이드 주석 추가
+| | * | | | | 08a0848 docs: troubleshooting-log에 amend 시나리오 실습 기록 추가
+| | * | | | | 5904d44 docs: PR 템플릿에 관련 이슈(Closes) 항목 추가
+| | |/ / / /  
+| * | | | |   c81ecee Merge pull request #12 from wasw2123/feat/subtract
+| |\ \ \ \ \  
+| | |/ / / /  
+| |/| | | |   
+| | * | | | 80522eb test: 테스트 통일성 있게 변경
+| | * | | |   97cf460 Merge branch 'main' into feat/subtract
+| | |\ \ \ \  
+| | |/ / / /  
+| |/| | | |   
+| * | | | |   ef22071 Merge pull request #11 from wasw2123/feat/branch-protection-rule
+| |\ \ \ \ \  
+| | |_|_|_|/  
+| |/| | | |   
+| | * | | | fbd96c3 docs: 브랜치 보호 규칙에 강제 push 및 브랜치 삭제 금지 안내 추가
+| | * | | | 9889e8a docs: 브랜치 보호 규칙 안내 추가
+| * | | | |   cdc71a4 Merge pull request #22 from wasw2123/feat/troubleshooting-revert
+| |\ \ \ \ \  
+| | * | | | | 525c517 docs: troubleshooting-log에 revert 시나리오 기록
+| | * | | | | c43e8c9 fix: 몫 연산 기준 변경 되돌리기
+| | * | | | | 33001af refactor: 몫 연산을 int(a / b) 방식으로 변경
+| | | |_|_|/  
+| | |/| | |   
+| | | | * | 4f8963d refactor: 빼기 연산 함수 타입 지정 및 docstring추가, 개행 수정
+| | | | * | aa35ad2 test: 뻬기 연산 단위테스트 추가
+| | | | * | 84edf03 refactor: 빼기 연산 파일 및 함수 이름 수정
+| | | | * | 6d990c1 feat:빼기 연산 함수 구현
+| | | |/ /  
+* | | | | 25f3054 Merge branch 'main' into feat/add-readme
+|\| | | | 
+| * | | |   9f87f86 Merge pull request #16 from wasw2123/feat/add
+| |\ \ \ \  
+| | | |_|/  
+| | |/| |   
+| * | | |   ef08031 Merge pull request #18 from wasw2123/feat/remainder
+| |\ \ \ \  
+| | |_|/ /  
+| |/| | |   
+| | * | | 79b1725 refactor: 나머지 연산 변수명을 Dividend, Divisor로 명시
+| | * | | 6acb661 test: 나머지 연산 함수 단위 테스트 추가
+| | * | | 78b74cd feat: 나머지 연산 유틸 함수 구현
+| | | |/  
+| | |/|   
+| * | |   77321b2 Merge pull request #14 from wasw2123/feat/update-contributing
+| |\ \ \  
+| | * | | 40465b9 docs: CONTRIBUTING에 PR·리뷰·충돌 대응 규칙 초안 추가
+| | |/ /  
+| * | |   f1d2241 Merge pull request #15 from wasw2123/feat/quotient
+| |\ \ \  
+| | |/ /  
+| |/| |   
+| | * | afe351e test: 몫 연산 함수 단위 테스트 추가
+| | * | 7bf91e0 feat: 몫 연산 유틸 함수 구현
+| |/ /  
+* | / d8a37fa docs: 기본적인 설명을 하는 README.md파일 추가, SUBBMISSION 기본틀 작성
+| |/  
+|/|   
+* | 5cac416 test: 테스트 파일 이동
+* | e891299 docs: 커밋메시지 test관련 내용 추가
+* | 7a1c33d test: test형식 통일
+* | bc8e8a5 fix: add함수 내 docstring 추가
+* | ef058f1 chore: 깃이그노어 개인 문서함 제거, 파이썬 버전 고정 제거
+* | e876cfe feat: 더하기 연산  테스트 함수 추가
+* | 5f6376a docs: 커밋메시지 규칙  chore 추가
+* | 76d6214 chore: .gitignore에 개인문서 제외 작성
+* | 13b72d2 Merge branch 'main' into feat/add
+|\| 
+| *   86307dd Merge pull request #9 from wasw2123/feat/multiplier
+| |\  
+| | * 596dc1f fix: multiplier 함수내  docstring 추가 작성
+| | * 0a8693c chore: 파이썬 캐시 파일 .gitignore 추가
+| | * 0f3c409 test: 곱셈기 함수 단위 테스트 추가
+| | * 4c7859c feature: PR 템플릿 제작
+| | * f4d0160 feature: 곱셈기 유틸 함수 구현
+| |/  
+* | 8b8664f docs: 파이썬 버전 고정 문서 작성
+* | 6ee09f7 feat: 두 수를 합하는 더하기 함수 제작
+|/  
+*   c0b3645 Merge pull request #1 from wasw2123/docs/convention
+|\  
+| * 6f6ba72 docs: 기본 컨벤션 문서 제작 및 필요문서 바탕 제작
+|/  
+* 89382e5 first commit
