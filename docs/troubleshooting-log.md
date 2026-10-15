@@ -75,7 +75,83 @@ Date:   Thu Oct 15 11:29:23 2026 +0900
 
 ## 시나리오: reset
 
-<!-- TODO(담당자 작성): git reset --soft HEAD~1 (로컬 커밋 취소 + 변경 유지) -->
+### 참여자
+- Sinai-Cho(조시내) : 커밋 리셋
+
+### 1) 문제 상황 (Problem)
+
+빼기 연산 함수에 대한 코드 리뷰 의견을 반영하기 위해 기존 작업 브랜치인 `feat/subtract`에서 아래의 내용을 수정했습니다.
+
+- 함수에 Docstring 추가
+- 매개변수와 반환값에 `int` 타입 힌트 추가
+- 함수 아래 개행 수정
+
+그러나 해당 변경 사항을 새로운 브랜치에서 별도로 관리하기로 결정했음에도, 기존 `feat/subtract` 브랜치에서 먼저 커밋하는 문제가 발생하여 기존 커밋을 취소하고, 수정한 코드 내용은 유지한 상태로 새로운 브랜치에서 다시 커밋해야하는 상황이 되었습니다.
+
+### 2. 문제 원인 (Cause)
+
+코드를 수정하기 전에 새로운 작업 브랜치를 생성하지 않았기 때문입니다.
+
+### 3. 해결 과정 (Solution)
+
+#### 1) 기존 커밋 확인
+
+먼저 현재 브랜치와 최근 커밋 기록을 확인했습니다.
+```bash
+git branch --show-current
+git log -3 --oneline
+git status
+```
+(가장 최근 커밋이 Docstring과 타입 힌트 수정 작업에 해당하는지 확인)
+
+#### 2) Git Reset 실행
+
+가장 최근 커밋을 취소하되 수정한 파일 내용은 유지하기 위해 다음 명령어를 사용했습니다.
+
+```bash
+git reset --mixed HEAD~1
+```
+< 참고 : 각 명령어 뜻 >
+- `reset`: 브랜치의 HEAD를 이전 커밋으로 이동
+- `--mixed`: 스테이징 상태를 초기화하고 수정 파일 내용은 유지
+- `HEAD~1`: 현재 커밋의 바로 이전 커밋
+
+이를 통해 최근 커밋을 취소하면서 `src/subtract.py`의 수정 사항은 작업 폴더에 유지할 수 있었습니다.
+
+#### 3) 새로운 브랜치 생성
+
+수정 내용을 별도로 관리하기 위해 새로운 브랜치를 생성했습니다.
+
+```bash
+git switch -c feat/subtract-refactor
+```
+
+#### 4) 수정 내용 다시 커밋
+
+새로운 브랜치에서 수정된 파일을 스테이징하고 다시 커밋을 진행했습니다.
+
+```bash
+git add src/subtract.py
+
+git commit -m "refactor: 빼기 연산 함수에 docstring, 타입 힌트 및 개행 추가"
+```
+
+#### 5) GitHub에 Push
+
+새로운 브랜치를 원격 저장소에 Push 했습니다.
+
+```bash 
+git push -u origin feat/subtract-refactor
+```
+
+### 4. 결과 (Result)
+
+- 기존 브랜치에서 잘못 작성한 커밋 취소.
+- 수정한 Python 코드 내용은 삭제하지 않고 유지.
+- `feat/subtract-refactor` 브랜치에서 수정 사항을 다시 커밋.
+- 새로운 브랜치에 변경 내용을 Push하여 작업을 분리.
+
+이후 팀원들과 협의하여 두 작업 브랜치를 통합하기로 결정했고, `feat/subtract-refactor`의 변경 사항을 `feat/subtract`에 Fast-forward Merge하여 최종적으로 기존 PR에 반영했습니다.
 
 ## 시나리오: revert
 
