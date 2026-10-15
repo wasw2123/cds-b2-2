@@ -11,4 +11,4 @@ def quotient(a: int, b: int) -> int:
     Raises:
         ZeroDivisionError: b가 0인 경우.
     """
-    return a // b
+    return int(a / b)
