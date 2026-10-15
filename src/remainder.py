@@ -2,14 +2,18 @@ def remainder(a: int, b: int) -> int:
     """두 정수를 나눈 나머지를 반환합니다.
 
     Args:
-        a (int): 나누어지는 수.
-        b (int): 나누는 수.
+        a (int): 나누어지는 수. Dividend.
+        b (int): 나누는 수. Divisor.
 
     Returns:
-        int: a를 b로 나눈 나머지 (a % b). 결과의 부호는 b의 부호를 따릅니다.
+        int: Dividend를 Divisor로 나눈 나머지 (Dividend % Divisor). 결과의 부호는 Divisor의 부호를 따릅니다.
             예: remainder(-7, 2) == 1, remainder(7, -2) == -1
 
     Raises:
-        ZeroDivisionError: b가 0인 경우.
+        ZeroDivisionError: Divisor가 0인 경우.
     """
-    return a % b
+
+    dividend = a
+    divisor = b
+
+    return dividend % divisor
