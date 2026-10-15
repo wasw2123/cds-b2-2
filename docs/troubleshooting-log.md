@@ -2,7 +2,76 @@
 
 ## 시나리오: amend
 
-<!-- TODO(담당자 작성): git commit --amend (최근 커밋 메시지 수정) -->
+### 참여자
+
+- Yoonsik-Shin: 실습 수행 및 기록
+
+### 상황
+
+- 실습을 위해 의도적으로 재현한 상황입니다.
+- PR 템플릿(`.github/pull_request_template.md`)에 이슈 자동 연동을 위한 `Closes #` 항목을 추가하는 과정에서 실수 발생:
+  - 파일 본문에 오타 작성: `Closes` 대신 `Clsoes` 입력
+  - 커밋 메시지 컨벤션 및 오타 발생: `docs:` 대신 `doc:`, `추가` 대신 `추갖` 입력
+- 원격에 push하기 전 로컬 커밋 상태에서 오타 및 컨벤션 위반을 발견했습니다.
+
+```text
+$ git log -1
+commit 4d5c848ec81e95119d5976a47bbc20698f6886c7 (HEAD -> feat/troubleshooting-amend)
+Author: Yoonsik-Shin <sys25800994@gmail.com>
+Date:   Thu Oct 15 11:29:23 2026 +0900
+
+    doc: PR 템플릿에 Clsoes 이슈 연동 항목 추갖
+```
+
+### 시도한 명령/절차
+
+1. 파일 내용 오타 수정 후 Staging
+
+```text
+# 파일 내용 수정 (Clsoes -> Closes) 후 스테이징
+$ git add .github/pull_request_template.md
+```
+
+2. `git commit --amend`로 직전 커밋 내용 및 메시지 덮어쓰기
+
+```text
+$ git commit --amend -m "docs: PR 템플릿에 관련 이슈(Closes) 항목 추가"
+[feat/troubleshooting-amend 88b4953] docs: PR 템플릿에 관련 이슈(Closes) 항목 추가
+ Date: Thu Oct 15 11:29:23 2026 +0900
+ 1 file changed, 4 insertions(+)
+```
+
+3. 결과 확인
+
+```text
+$ git log -1 --stat
+commit 88b4953c829e1f5795cb99f46487e6fa78c80fd2 (HEAD -> feat/troubleshooting-amend)
+Author: Yoonsik-Shin <sys25800994@gmail.com>
+Date:   Thu Oct 15 11:29:23 2026 +0900
+
+    docs: PR 템플릿에 관련 이슈(Closes) 항목 추가
+
+ .github/pull_request_template.md | 4 ++++
+ 1 file changed, 4 insertions(+)
+```
+
+### 결과
+
+- 수정 커밋: `88b4953` `docs: PR 템플릿에 관련 이슈(Closes) 항목 추가`
+- 새로운 커밋을 추가로 만들어 불필요한 "오타 수정" 커밋 히스토리를 남기지 않고, 직전 커밋 하나로 깔끔하게 통합되었습니다.
+- 커밋 해시가 `4d5c848`에서 `88b4953`으로 변경되었습니다.
+
+### 왜 이 방법을 선택했는가(Why)
+
+- **원격(Remote)에 push되지 않은 로컬 커밋**:
+  - 아직 원격 저장소에 공유되지 않은 커밋이므로 다른 팀원에게 영향을 주지 않고 안전하게 히스토리를 재작성할 수 있습니다.
+- **불필요한 수정 커밋 방지**:
+  - 오타 수정이나 파일 누락 때문에 불필요한 별도 커밋(`fix typo` 등)을 계속 쌓지 않고, 원래 의도했던 단일 원자적 커밋(Atomic Commit)으로 유지할 수 있습니다.
+- **주의할 점**:
+  - `git commit --amend`는 기존 커밋을 수정하는 것이 아니라 **새로운 커밋 객체를 생성해 대체**하는 작업입니다.
+  - 따라서 이미 원격 저장소에 push된 커밋에 `amend`를 수행하면 로컬과 원격의 히스토리가 갈라져 `git push --force`가 필요하게 되며, 이는 다른 협업자의 작업에 충돌을 유발할 수 있습니다.
+  - **이미 push된 커밋은 `git revert`를 사용하거나 추가 커밋을 작성하고, `amend`는 오직 로컬 커밋에만 사용**해야 합니다.
+
 
 ## 시나리오: reset
 
