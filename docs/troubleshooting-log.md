@@ -1,0 +1,106 @@
+# Troubleshooting Log
+
+## 시나리오: amend
+
+<!-- TODO(담당자 작성): git commit --amend (최근 커밋 메시지 수정) -->
+
+## 시나리오: reset
+
+<!-- TODO(담당자 작성): git reset --soft HEAD~1 (로컬 커밋 취소 + 변경 유지) -->
+
+## 시나리오: revert
+
+### 참여자
+
+- ADOHI: 실습 수행 및 기록
+
+### 상황
+
+- 실습을 위해 의도적으로 재현한 상황입니다. (이슈 #21)
+- `feat/troubleshooting-revert` 브랜치에서 몫 연산을 `a // b`에서 `int(a / b)`로 바꾼 커밋을 원격에 push했습니다.
+  - 커밋: [`33001af`](https://github.com/wasw2123/cds-b2-2/commit/33001afa0e9d37cef9d27ac5d2d4c4f5029c9c71) `refactor: 몫 연산을 int(a / b) 방식으로 변경`
+- 동작이 같다고 생각하고 `refactor`로 바꿨지만, `int(a / b)`는 0 방향으로 버리기 때문에 음수에서 결과가 달라집니다.
+- 단위 테스트로 문제를 발견했습니다.
+
+```text
+FAIL: test_negative_numbers (test_quotient.TestQuotient)
+    self.assertEqual(quotient(-7, 2), -4)
+AssertionError: -3 != -4
+
+FAILED (failures=1)
+```
+
+### 시도한 명령/절차
+
+1. 되돌릴 커밋 확인
+
+```text
+$ git log --oneline -3
+33001af refactor: 몫 연산을 int(a / b) 방식으로 변경
+77321b2 Merge pull request #14 from wasw2123/feat/update-contributing
+f1d2241 Merge pull request #15 from wasw2123/feat/quotient
+```
+
+2. revert 실행 (커밋 메시지를 팀 컨벤션에 맞추기 위해 `--no-commit` 후 직접 커밋)
+
+```text
+$ git revert --no-commit 33001af
+$ git commit -m "fix: 몫 연산 기준 변경 되돌리기" -m "This reverts commit 33001afa0e9d37cef9d27ac5d2d4c4f5029c9c71."
+[feat/troubleshooting-revert c43e8c9] fix: 몫 연산 기준 변경 되돌리기
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+3. 복구 확인 후 일반 push
+
+```text
+$ python -m unittest discover -s tests
+Ran 8 tests in 0.000s
+OK
+
+$ git diff 33001af^ HEAD --stat
+(출력 없음: 실수 커밋 직전 상태와 동일)
+
+$ git push
+   33001af..c43e8c9  feat/troubleshooting-revert -> feat/troubleshooting-revert
+```
+
+### 결과
+
+- 되돌리기 커밋: [`c43e8c9`](https://github.com/wasw2123/cds-b2-2/commit/c43e8c9742da565ed46bc1107670845020dabd20) `fix: 몫 연산 기준 변경 되돌리기`
+- 실수 커밋을 지우지 않고, 그 변경을 정반대로 적용하는 커밋을 추가해 코드를 원래대로 되돌렸습니다.
+- 히스토리에는 실수 커밋과 되돌리기 커밋이 모두 남아, 무엇이 왜 되돌려졌는지 추적할 수 있습니다.
+
+```text
+* c43e8c9 fix: 몫 연산 기준 변경 되돌리기
+* 33001af refactor: 몫 연산을 int(a / b) 방식으로 변경
+*   77321b2 Merge pull request #14 from wasw2123/feat/update-contributing
+```
+
+- 주의할 점
+  - revert는 커밋을 없애는 것이 아니라 새 커밋을 추가합니다. 되돌린 변경을 다시 적용하려면 revert 커밋을 다시 revert해야 합니다.
+  - 머지 커밋을 되돌릴 때는 기준 부모를 지정하는 `-m 1` 옵션이 필요합니다.
+  - git 기본 메시지(`Revert "..."`)는 팀 컨벤션과 맞지 않으므로 메시지를 직접 작성하고, 본문에 `This reverts commit <hash>.`를 남겨 추적할 수 있게 합니다.
+  - 이 PR을 Squash로 병합하면 두 커밋이 하나로 합쳐져 기록이 사라지므로 Merge commit으로 병합합니다.
+
+### 왜 이 방법을 선택했는가(Why)
+
+- 실수 커밋이 이미 원격에 push되어 있어, 다른 팀원이 받아갔을 수 있는 히스토리를 바꾸지 않는 revert를 선택했습니다.
+- `reset`으로 커밋을 지우면 로컬과 원격 히스토리가 갈라져 일반 push가 거부됩니다. 아래는 reset 후 상태(`77321b2`)를 push하는 경우를 `--dry-run`으로 확인한 결과입니다.
+
+```text
+$ git push --dry-run origin 77321b2:refs/heads/feat/troubleshooting-revert
+ ! [rejected]        77321b2 -> feat/troubleshooting-revert (non-fast-forward)
+error: failed to push some refs to 'https://github.com/wasw2123/cds-b2-2'
+```
+
+- 이를 push하려면 강제 push가 필요한데, 이는 팀 규칙(합의 없는 강제 push 금지)에 어긋나고 `main`에서는 ruleset으로 차단됩니다. revert는 일반 push로 끝나므로 이런 문제가 없습니다.
+
+| | `reset` | `revert` |
+| --- | --- | --- |
+| 동작 | 커밋을 히스토리에서 지움 | 반대 변경을 담은 커밋을 추가 |
+| 이미 push된 커밋 | 강제 push 필요, 팀원 히스토리와 어긋남 | 일반 push로 해결 |
+| 적합한 상황 | 아직 push하지 않은 로컬 커밋 | 이미 공유된 커밋 |
+
+## 시나리오: stash
+
+<!-- TODO(담당자 작성): git stash / git stash pop (작업 보관 후 전환) -->
