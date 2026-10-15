@@ -75,7 +75,156 @@ Date:   Thu Oct 15 11:29:23 2026 +0900
 
 ## 시나리오: reset
 
-<!-- TODO(담당자 작성): git reset --soft HEAD~1 (로컬 커밋 취소 + 변경 유지) -->
+### 참여자
+
+- deliolleh(한재혁): 시나리오 선정, 결과 검토 및 기록 확인
+- 명령 실행 및 기록 초안: 사용자 요청에 따라 Claude Code가 수행
+
+### 상황
+
+- 실습을 위해 의도적으로 재현한 상황입니다. (이슈 #31)
+- `feat/troubleshooting-reset` 브랜치에서 몫·나머지 정합성 테스트에 음수 피제수 케이스 `(-1, 3)`을 추가하던 중, 값을 눈으로 확인하려고 `src/remainder.py`에 `print(...)` 디버그 줄을 넣었습니다.
+- 확인이 끝난 뒤 디버그 줄을 지우는 것을 잊은 채 `git commit -am "update"`로 커밋했습니다. 두 가지 실수가 한 커밋에 들어갔습니다.
+  - 커밋 메시지 `update`는 팀 컨벤션에서 금지한 "의미 없는 메시지"입니다.
+  - 커밋 내용에 테스트와 무관한 디버그 코드가 섞여 있습니다.
+
+```text
+$ git log --oneline -3
+664e42d update
+a2d48ae Merge pull request #27 from wasw2123/feat/division-consistency
+d33cbd8 Merge pull request #28 from wasw2123/feat/troubleshooting-amend
+
+$ git show --stat --oneline HEAD
+664e42d update
+ src/remainder.py                   | 1 +
+ tests/test_division_consistency.py | 1 +
+ 2 files changed, 2 insertions(+)
+```
+
+- 되돌리기 전에 이 커밋이 원격에 없는지 확인했습니다. 브랜치 자체가 아직 push된 적이 없어 `ls-remote` 결과가 비어 있습니다.
+
+```text
+$ git ls-remote --heads origin feat/troubleshooting-reset
+(출력 없음: 원격에 브랜치 없음)
+```
+
+### 시도한 명령/절차
+
+1. 커밋 취소, 변경은 staged 상태로 유지
+
+```text
+$ git reset --soft HEAD~1
+
+$ git log --oneline -2
+a2d48ae Merge pull request #27 from wasw2123/feat/division-consistency
+d33cbd8 Merge pull request #28 from wasw2123/feat/troubleshooting-amend
+
+$ git status
+On branch feat/troubleshooting-reset
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   src/remainder.py
+	modified:   tests/test_division_consistency.py
+```
+
+2. 풀린 커밋의 내용을 staged 상태에서 다시 점검
+
+```text
+$ git diff --cached
+diff --git a/src/remainder.py b/src/remainder.py
+@@ -15,5 +15,6 @@ def remainder(a: int, b: int) -> int:
+     dividend = a
+     divisor = b
++    print(dividend, divisor)  # debug
+
+     return dividend % divisor
+diff --git a/tests/test_division_consistency.py b/tests/test_division_consistency.py
+@@ -19,6 +19,7 @@ class TestDivisionConsistency(unittest.TestCase):
+         (10, 5),
+         (0, 3),
+         (3, 5),
++        (-1, 3),
+     ]
+```
+
+3. 디버그 줄만 커밋 대상에서 제외하고 작업 파일에서도 제거
+
+```text
+$ git restore --staged src/remainder.py
+$ git restore src/remainder.py
+
+$ git status
+On branch feat/troubleshooting-reset
+Changes to be committed:
+	modified:   tests/test_division_consistency.py
+```
+
+4. 테스트 확인 후 컨벤션에 맞는 메시지로 다시 커밋
+
+```text
+$ python3 -m unittest tests/test_division_consistency.py -v
+test_division_identity ... ok
+test_remainder_sign_follows_divisor ... ok
+test_remainder_smaller_than_divisor ... ok
+Ran 3 tests in 0.000s
+OK
+
+$ git commit -m "test: 정합성 테스트에 음수 피제수 케이스 추가"
+[feat/troubleshooting-reset 702553d] test: 정합성 테스트에 음수 피제수 케이스 추가
+ 1 file changed, 1 insertion(+)
+```
+
+5. 결과 확인 및 일반 push
+
+```text
+$ git log --oneline -3
+702553d test: 정합성 테스트에 음수 피제수 케이스 추가
+a2d48ae Merge pull request #27 from wasw2123/feat/division-consistency
+d33cbd8 Merge pull request #28 from wasw2123/feat/troubleshooting-amend
+
+$ git diff HEAD~1 --stat
+ tests/test_division_consistency.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+$ git push -u origin feat/troubleshooting-reset
+To https://github.com/wasw2123/cds-b2-2.git
+ * [new branch]      feat/troubleshooting-reset -> feat/troubleshooting-reset
+branch 'feat/troubleshooting-reset' set up to track 'origin/feat/troubleshooting-reset'.
+```
+
+강제 옵션 없이 일반 push로 올라갔습니다. reset이 원격 히스토리에 영향을 주지 않았다는 뜻입니다.
+
+### 결과
+
+- 잘못된 커밋 `664e42d`(`update`, 2개 파일)가 `702553d`(`test: 정합성 테스트에 음수 피제수 케이스 추가`, 1개 파일)로 바뀌었습니다.
+- 커밋 수는 그대로 1개이고, 디버그 코드는 히스토리에 남지 않았습니다.
+- `src/remainder.py`는 `main`과 동일한 상태로 돌아갔습니다.
+- 취소된 커밋은 삭제된 것이 아니라 reflog에 남아 있어, 실수로 reset했더라도 `git reset --soft 664e42d`로 복구할 수 있습니다.
+
+```text
+$ git reflog -3
+702553d HEAD@{0}: commit: test: 정합성 테스트에 음수 피제수 케이스 추가
+a2d48ae HEAD@{1}: reset: moving to HEAD~1
+664e42d HEAD@{2}: commit: update
+```
+
+- 주의할 점
+  - `reset`은 push하지 않은 로컬 커밋에만 사용합니다. push된 커밋을 reset하면 원격과 히스토리가 갈라져 강제 push가 필요해지고, 이는 팀 규칙에 어긋납니다.
+  - 되돌려도 되는 범위는 push 여부로 정합니다. 브랜치가 원격에 있으면 `git status -sb`의 `[ahead N]`이 로컬에만 있는 커밋 수이고, `HEAD~1`은 이 수를 넘지 않아야 합니다. 이번처럼 브랜치가 원격에 없으면 `git ls-remote --heads origin <브랜치>`가 비어 있는 것으로 확인합니다.
+  - `--soft`는 index와 작업 파일을 모두 유지합니다. 옵션을 잘못 쓰면 변경이 사라질 수 있으므로 아래 표의 차이를 알고 써야 합니다. 특히 `--hard`는 작업 파일까지 버립니다.
+  - `git commit -a`는 추적 중인 모든 수정을 한 번에 담기 때문에 이번처럼 무관한 변경이 섞이기 쉽습니다. 커밋 전 `git diff --cached`로 내용을 확인하는 습관이 재발 방지책입니다.
+
+| 옵션 | 커밋 | staged(index) | 작업 파일 |
+| --- | --- | --- | --- |
+| `--soft` | 취소 | 유지 | 유지 |
+| `--mixed`(기본) | 취소 | 풀림(unstaged) | 유지 |
+| `--hard` | 취소 | 버림 | 버림 |
+
+### 왜 이 방법을 선택했는가(Why)
+
+- **왜 `revert`가 아닌가**: 실수 커밋이 아직 원격에 없으므로 공유된 히스토리가 없습니다. 되돌리기 커밋을 추가하면 `update`와 그 되돌리기가 둘 다 남아 히스토리만 지저분해집니다. revert는 push된 커밋에 쓰는 방법입니다.
+- **왜 `--amend`가 아닌가**: amend는 직전 커밋에 변경을 덧붙이거나 메시지를 바꿀 때 적합합니다. 이번에는 커밋에서 파일 하나를 빼야 했으므로, 커밋을 완전히 풀어 staged 상태에서 `git diff --cached`로 내용을 확인하고 다시 구성하는 `reset --soft`가 맞습니다. 메시지나 작은 누락은 amend, 커밋 내용을 다시 구성하거나 여러 커밋을 합칠 때(`HEAD~2` 이상)는 `reset --soft`로 구분합니다.
+- **왜 `--soft`인가**: 작성한 테스트 케이스는 그대로 살려야 했습니다. `--soft`는 변경을 staged 상태로 유지하므로 필요한 파일만 남기고 바로 다시 커밋할 수 있었습니다.
 
 ## 시나리오: revert
 
