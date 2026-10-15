@@ -21,6 +21,7 @@ python3 --version
 ```text
 cds-b2-2/
 ├── README.md                      # 프로젝트 안내
+├── SUBMISSION.md                  # 팀원별 기여 및 제출 증빙
 ├── .gitignore                     # 팀 공통 Git 제외 규칙
 ├── .github/
 │   └── pull_request_template.md    # PR 작성 양식
@@ -29,20 +30,18 @@ cds-b2-2/
 └── docs/                          # 협업 규칙 및 실습 기록
     ├── CONTRIBUTING.md
     ├── conflict-resolution.md
-    └── troubleshooting-log.md
+    ├── troubleshooting-log.md
+    └── evidence/                  # Git 히스토리 증빙
 ```
 
 ## 연산 구성
-<!-- TODO 자신이 제작한 함수와 파일, 상태를 업데이트 해주세요 -->
-| 연산 | 함수 | 파일 | 현재 로컬 상태 |
+| 연산 | 함수 | 파일 | 상태 |
 | --- | --- | --- | --- |
 | 더하기 | `add(a, b)` | [src/addition.py](src/addition.py) | 구현됨 |
-| 빼기 | 추가 예정 | 추가 예정 | 미반영 |
-| 몫 | 추가 예정 | 추가 예정 | 미반영 |
-| 나머지 | 추가 예정 | 추가 예정 | 미반영 |
+| 빼기 | `subtract(a, b)` | [src/subtract.py](src/subtract.py) | 구현됨 |
+| 몫 | `quotient(a, b)` | [src/quotient.py](src/quotient.py) | 구현됨 |
+| 나머지 | `remainder(a, b)` | [src/remainder.py](src/remainder.py) | 구현됨 |
 | 곱하기 | `multiplier(a, b)` | [src/multiplier.py](src/multiplier.py) | 구현됨 |
-
-팀원별 담당 함수를 추가하면서 함수 목록과 사용 예시를 갱신합니다.
 
 ## 사용 방법
 
@@ -58,13 +57,21 @@ Python에서 다음과 같이 사용합니다.
 
 ```python
 from src.addition import add
+from src.subtract import subtract
+from src.quotient import quotient
+from src.remainder import remainder
 from src.multiplier import multiplier
 
 add(1, 2)         # 3
 add(-1, -2)       # -3
+subtract(5, 2)    # 3
+quotient(7, 2)    # 3
+remainder(7, 2)   # 1
 multiplier(2, 3)  # 6
 multiplier(-2, 3) # -6
 ```
+
+몫은 Python의 내림 나눗셈(`//`)을 사용합니다. 예를 들어 `quotient(-7, 2)`는 `-4`, `remainder(-7, 2)`는 `1`입니다. 몫·나머지 함수에서 두 번째 인수가 0이면 `ZeroDivisionError`가 발생합니다.
 
 ## 테스트 실행
 
