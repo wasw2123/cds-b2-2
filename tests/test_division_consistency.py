@@ -19,6 +19,7 @@ class TestDivisionConsistency(unittest.TestCase):
         (10, 5),
         (0, 3),
         (3, 5),
+        (-1, 3),
     ]
 
     def test_division_identity(self):
